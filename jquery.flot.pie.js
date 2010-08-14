@@ -40,6 +40,10 @@ Available slice options are:
   * color: color code or name
     A color for this slice. If not given, a color will be automatically selected.
 
+  * distanceFromCenter: number
+    The distance in pixels that this slice should be located away from the center,
+    according to its angle. Defaults to 0.
+
 
 Pie chart options
 -----------------
@@ -286,7 +290,8 @@ More detail and specific examples can be found in the included HTML file.
 						color: data[i].color, 
 						label: data[i].label,
 						angle: (data[i].data[0][1]*(Math.PI*2))/total,
-						percent: (data[i].data[0][1]/total*100)
+						percent: (data[i].data[0][1]/total*100),
+						distanceFromCenter: data[i].distanceFromCenter || 0
 					});
 				}
 			}
@@ -399,7 +404,8 @@ More detail and specific examples can be found in the included HTML file.
 				for (var i = 0; i < slices.length; ++i)
 				{
 					slices[i].startAngle = currentAngle;
-					drawSlice(slices[i].angle, slices[i].color, true);
+					drawSlice(slices[i].angle, slices[i].distanceFromCenter,
+						slices[i].color, true);
 				}
 				ctx.restore();
 				
@@ -408,7 +414,8 @@ More detail and specific examples can be found in the included HTML file.
 				ctx.lineWidth = options.series.pie.stroke.width;
 				currentAngle = startAngle;
 				for (var i = 0; i < slices.length; ++i)
-					drawSlice(slices[i].angle, options.series.pie.stroke.color, false);
+					drawSlice(slices[i].angle, slices[i].distanceFromCenter,
+						options.series.pie.stroke.color, false);
 				ctx.restore();
 					
 				// draw donut hole
@@ -421,8 +428,10 @@ More detail and specific examples can be found in the included HTML file.
 				// restore to original state
 				ctx.restore();
 				
-				function drawSlice(angle, color, fill)
+				function drawSlice(angle, distanceFromCenter, color, fill)
 				{	
+					var startx, starty;
+					
 					if (angle<=0)
 						return;
 				
@@ -434,13 +443,17 @@ More detail and specific examples can be found in the included HTML file.
 						ctx.lineJoin = 'round';
 					}
 						
+					// Some distance from the center of the pie according to the given angles.
+					startx = distanceFromCenter * Math.cos(-(currentAngle + angle / 2));
+					starty = -distanceFromCenter * Math.sin(-(currentAngle + angle / 2));
+					
 					ctx.beginPath();
 					if (angle!=Math.PI*2)
-						ctx.moveTo(0,0); // Center of the pie
+						ctx.moveTo(startx,starty);
 					else if ($.browser.msie)
 						angle -= 0.0001;
 					//ctx.arc(0,0,radius,0,angle,false); // This doesn't work properly in Opera
-					ctx.arc(0,0,radius,currentAngle,currentAngle+angle,false);
+					ctx.arc(startx,starty,radius,currentAngle,currentAngle+angle,false);
 					ctx.closePath();
 					//ctx.rotate(angle); // This doesn't work properly in Opera
 					currentAngle += angle;
