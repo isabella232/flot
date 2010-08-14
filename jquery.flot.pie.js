@@ -1,13 +1,8 @@
 /*
-Flot plugin for rendering pie charts. The plugin assumes the data is 
-coming is as a single data value for each series, and each of those 
-values is a positive value or zero (negative numbers don't make 
-any sense and will cause strange effects). The data values do 
-NOT need to be passed in as percentage values because it 
-internally calculates the total and percentages.
+Flot plugin for rendering pie charts.
 
 * Created by Brian Medendorp, June 2009
-* Updated November 2009 with contributions from: btburnett3, Anthony Aragues and Xavi Ivars
+* Updated with contributions from: btburnett3, Anthony Aragues, Xavi Ivars and Hongli Lai
 
 * Changes:
 	2009-10-22: lineJoin set to round
@@ -17,7 +12,44 @@ internally calculates the total and percentages.
 	2009-11-18: Added bug fix submitted by Xavi Ivars (issues with arrays when other JS libraries are included as well)
 		
 
-Available options are:
+Usage
+-----
+The data defines the slices in the pie chart. It is to be an array of objects,
+each of which describes a single slice. For example:
+
+    [
+        { label: "Apples sold", data: 500 },
+        { label: "Grapes sold", data: 200 },
+        { label: "Kiwis sold",  data: 750 }
+    ]
+
+Available slice options are:
+
+  * data: number (required)
+    Describes the size of this slice. This does not have to be a percentage; the
+    percentage will be automatically calculated from the grand total.
+    This must be a positive value or zero. Negative numbers don't make any sense
+    and will cause strange effects.
+    
+    This is the only required option; all the others are optional.
+    
+  * label: string
+    A label for this slice. Labels will be used for rendering the legend as well
+    as text on the slices themselves. See also the 'label' pie chart option.
+
+  * color: color code or name
+    A color for this slice. If not given, a color will be automatically selected.
+
+
+Pie chart options
+-----------------
+
+grid: {
+	clickable: true/false
+	   If set to true, then a pie slice will be automatically highlighted when clicked.
+	hoverable: true/false
+	   If set to true, then a pie slice will be automatically highlighted when hovered over.
+},
 series: {
 	pie: {
 		show: true/false
