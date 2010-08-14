@@ -17,7 +17,8 @@ Options:
   
   pan: {
     interactive: false
-    frameRate: 20
+    frameRate: 20,
+    mode: "xy"          // "xy", "x" or "y"
   }
 
   xaxis, yaxis, x2axis, y2axis: {
@@ -36,6 +37,10 @@ relative to the current viewport.
 will update itself while the user is panning around on it (set to null
 to disable intermediate pans, the plot will then not update until the
 mouse button is released).
+
+"mode" specifies the direction(s) that the plot may be panned to.
+The default value of "xy" allows panning into all directions. Set to
+"x" or "y" to limit panning to only one of those directions.
 
 "zoomRange" is the interval in which zooming can happen, e.g. with
 zoomRange: [1, 100] the zoom will never scale the axis so that the
@@ -114,7 +119,8 @@ Licensed under the MIT License ~ http://threedubmedia.googlecode.com/files/MIT-L
         },
         pan: {
             interactive: false,
-            frameRate: 20
+            frameRate: 20,
+            mode: "xy"
         }
     };
 
@@ -156,11 +162,27 @@ Licensed under the MIT License ~ http://threedubmedia.googlecode.com/files/MIT-L
                         return;
 
                     panTimeout = setTimeout(function () {
-                        plot.pan({ left: pageX - e.pageX,
-                                   top: pageY - e.pageY });
-                        pageX = e.pageX;
-                        pageY = e.pageY;
-                                                    
+                        var left, top, newPageX, newPageY;
+                        
+                        if (o.pan.mode.indexOf('x') > -1) {
+                            left = pageX - e.pageX;
+                            newPageX = e.pageX;
+                        } else {
+                            left = 0;
+                            newPageX = pageX;
+                        }
+                        if (o.pan.mode.indexOf('y') > -1) {
+                            top = pageY - e.pageY;
+                            newPageY = e.pageY;
+                        } else {
+                            top = 0;
+                            newPageY = pageY;
+                        }
+                        
+                        plot.pan({ left: left, top: top });
+                        pageX = newPageX;
+                        pageY = newPageY;
+                        
                         panTimeout = null;
                     }, 1/o.pan.frameRate * 1000);
                 });
@@ -171,8 +193,9 @@ Licensed under the MIT License ~ http://threedubmedia.googlecode.com/files/MIT-L
                     }
                     
                     eventHolder.css('cursor', prevCursor);
-                    plot.pan({ left: pageX - e.pageX,
-                               top: pageY - e.pageY });
+                    var left = (o.pan.mode.indexOf('x') > -1) ? pageX - e.pageX : 0;
+                    var top  = (o.pan.mode.indexOf('y') > -1) ? pageY - e.pageY : 0;
+                    plot.pan({ left: left, top: top });
                 });
             }
         }
