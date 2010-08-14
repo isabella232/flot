@@ -47,6 +47,8 @@ Changes:
 - Navigate plugin now redraws the plot while panning instead of only
   after the fact (can be disabled by setting the pan.frameRate option
   to null), raised by lastthemy (issue 235).
+- Navigate plugin now allows customization of panning mode so that
+  panning can be limited to only a single direction (issue 305).
 - Date formatter now accepts %0m and %0d to get a zero-padded month or
   day (issue raised by Maximillian Dornseif).
 - Revamped internals to support an unlimited number of axes, not just
