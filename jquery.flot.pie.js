@@ -43,6 +43,31 @@ Available slice options are:
   * distanceFromCenter: number
     The distance in pixels that this slice should be located away from the center,
     according to its angle. Defaults to 0.
+    
+    Please note that the pie chart is drawn in such a way that it utilizes all of
+    the canvas area while assuming that no slice has a distanceFromCenter to to > 0.
+    If you have a slice with distanceFromCenter set to > 0 then it probably won't
+    fit in the canvas area, and you'll see a partially drawn slice where a part of
+    it is chopped off. To combat this effect, you should set a margin in the pie
+    chart options. This margin should be set to the maximum expected value for
+    distanceFromCenter. For example:
+
+       data = [
+           { data: 100, distanceFromCenter: 15 },
+           { data: 150 },
+           { data: 120, distanceFromCenter: 20 }
+       ]
+
+    The maximum distanceFromCenter in this example value is 20, so the margin
+    should also be set to 20:
+
+       options = {
+           series: {
+               pie: {
+                   margin: 20
+               }
+           }
+       }
 
 
 Pie chart options
@@ -61,6 +86,7 @@ series: {
 		innerRadius: 0-1 for percentage of fullsize or a specified pixel length, for creating a donut effect
 		startAngle: 0-2 factor of PI used for starting angle (in radians) i.e 3/2 starts at the top, 0 and 2 have the same result
 		tilt: 0-1 for percentage to tilt the pie, where 1 is no tilt, and 0 is completely flat (nothing will show)
+		margin: integer value, defining a margin around the pie. Defaults to 0
 		offset: {
 			top: integer value to move the pie up or down
 			left: integer value to move the pie left or right, or 'auto'
@@ -225,7 +251,10 @@ More detail and specific examples can be found in the included HTML file.
 			legendWidth = target.children().filter('.legend').children().width();
 		
 			// calculate maximum radius and center point
-			maxRadius =  Math.min(canvas.width,(canvas.height/options.series.pie.tilt))/2;
+			maxRadius = Math.min(
+				canvas.width-options.series.pie.margin*2,
+				(canvas.height/options.series.pie.tilt-options.series.pie.margin*2)
+			)/2;
 			centerTop = (canvas.height/2)+options.series.pie.offset.top;
 			centerLeft = (canvas.width/2);
 			
@@ -756,6 +785,7 @@ More detail and specific examples can be found in the included HTML file.
 				innerRadius:0, /* for donut */
 				startAngle: 3/2,
 				tilt: 1,
+				margin: 0,
 				offset: {
 					top: 0,
 					left: 'auto'
