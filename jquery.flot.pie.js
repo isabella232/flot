@@ -461,7 +461,7 @@ More detail and specific examples can be found in the included HTML file.
 				{	
 					var startx, starty;
 					
-					if (angle<=0)
+					if (angle <= 0 || isNaN(angle))
 						return;
 				
 					if (fill)
@@ -477,8 +477,8 @@ More detail and specific examples can be found in the included HTML file.
 					starty = -distanceFromCenter * Math.sin(-(currentAngle + angle / 2));
 					
 					ctx.beginPath();
-					if (angle!=Math.PI*2)
-						ctx.moveTo(startx,starty);
+					if (Math.abs(angle - Math.PI*2) > 0.000000001)
+						ctx.moveTo(startx,starty); // Tip of slice
 					else if ($.browser.msie)
 						angle -= 0.0001;
 					//ctx.arc(0,0,radius,0,angle,false); // This doesn't work properly in Opera
@@ -681,12 +681,9 @@ More detail and specific examples can be found in the included HTML file.
 				}
 			}
 			
-			// if no slice was found, quit
-			if (!item) 
-				return;
-				
 			// highlight the slice
-			highlight(item.series, eventname);
+			if (item) 
+			    highlight(item.series, eventname);
 				
 			// trigger any hover bind events
 			var pos = { pageX: e.pageX, pageY: e.pageY };
@@ -759,13 +756,14 @@ More detail and specific examples can be found in the included HTML file.
 
 			function drawHighlight(series) 
 			{
-				if (series.angle < 0) return;
+				if (series.angle <= 0 || isNaN(series.angle))
+					return;
 				
 				//octx.fillStyle = parseColor(options.series.pie.highlight.color).scale(null, null, null, options.series.pie.highlight.opacity).toString();
 				octx.fillStyle = "rgba(255, 255, 255, "+options.series.pie.highlight.opacity+")"; // this is temporary until we have access to parseColor
 				
 				octx.beginPath();
-				if (series.angle!=Math.PI*2)
+				if (Math.abs(series.angle - Math.PI*2) > 0.000000001)
 					octx.moveTo(0,0); // Center of the pie
 				octx.arc(0,0,radius,series.startAngle,series.startAngle+series.angle,false);
 				octx.closePath();
